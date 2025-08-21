@@ -1,12 +1,10 @@
 (function () {
   const prizes = [
-    "Add-on course",
+    "Add on course",
     "Prompt Engineering Program",
     "Onam Career Kit",
-    "5% Cashback",
-    "10% Cashback",
-    "15% Cashback",
-    "Better luck next time",
+    "Cashback",
+    "Better Luck Next time",
     "Onam Hamper"
   ];
 
@@ -16,9 +14,7 @@
     "#f8961e",
     "#90be6d",
     "#43aa8b",
-    "#577590",
-    "#9b5de5",
-    "#f9c74f"
+    "#577590"
   ];
 
   const registrationSection = document.getElementById("registrationSection");
@@ -104,8 +100,8 @@
       ctx.fill();
 
       // divider line
-      ctx.strokeStyle = "rgba(0,0,0,0.2)";
-      ctx.lineWidth = 1;
+      ctx.strokeStyle = "rgba(0,0,0,0.3)";
+      ctx.lineWidth = 2;
       ctx.beginPath();
       ctx.moveTo(0, 0);
       ctx.lineTo((radius - 8) * Math.cos(endAngle), (radius - 8) * Math.sin(endAngle));
@@ -116,22 +112,32 @@
       ctx.save();
       ctx.rotate(labelAngle);
       ctx.fillStyle = "#ffffff";
-      ctx.font = "bold 16px system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial";
+      ctx.font = "bold 18px system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial";
       ctx.textAlign = "right";
       ctx.textBaseline = "middle";
+      ctx.shadowColor = "rgba(0,0,0,0.8)";
+      ctx.shadowBlur = 3;
+      ctx.shadowOffsetX = 1;
+      ctx.shadowOffsetY = 1;
       const text = prizes[i];
-      wrapFillText(ctx, text, radius - 24, 0, 150);
+      wrapFillText(ctx, text, radius - 28, 0, 160);
       ctx.restore();
     }
 
     // center hub
     ctx.beginPath();
-    ctx.arc(0, 0, 40, 0, TWO_PI);
+    ctx.arc(0, 0, 45, 0, TWO_PI);
     ctx.fillStyle = "#111520";
     ctx.fill();
     ctx.lineWidth = 4;
-    ctx.strokeStyle = "rgba(255,255,255,0.12)";
+    ctx.strokeStyle = "rgba(255,255,255,0.15)";
     ctx.stroke();
+
+    // center circle highlight
+    ctx.beginPath();
+    ctx.arc(0, 0, 35, 0, TWO_PI);
+    ctx.fillStyle = "#1a1f2e";
+    ctx.fill();
 
     ctx.restore();
   }
@@ -152,7 +158,7 @@
       }
     }
     lines.push(line);
-    const lineHeight = 18;
+    const lineHeight = 20;
     const totalHeight = lineHeight * (lines.length - 1);
     for (let i = 0; i < lines.length; i++) {
       context.fillText(lines[i], x, y - totalHeight / 2 + i * lineHeight);
@@ -177,15 +183,16 @@
     resultText.textContent = "";
     thankYou.classList.add("hidden");
     spinBtn.disabled = true;
+    spinBtn.textContent = "Spinning...";
 
     // choose random prize index to determine target rotation
     const selectedIndex = Math.floor(Math.random() * prizes.length);
-    const extraTurns = 5 + Math.random() * 2; // 5-7 turns
+    const extraTurns = 6 + Math.random() * 3; // 6-9 turns
     const targetBase = -Math.PI / 2 - (selectedIndex * segmentAngle + segmentAngle / 2);
     const targetRotation = targetBase + extraTurns * TWO_PI;
 
     const start = performance.now();
-    const duration = 5200; // ms
+    const duration = 4500; // ms
     const startRotation = currentRotation;
 
     function frame(now) {
@@ -200,6 +207,7 @@
         // normalize to the actual final rotation (includes fractional turns)
         currentRotation = ((targetRotation % TWO_PI) + TWO_PI) % TWO_PI;
         isSpinning = false;
+        spinBtn.textContent = "Spin the Wheel";
         const finalIndex = indexFromRotation(currentRotation);
         if (typeof onComplete === "function") onComplete(finalIndex);
       }
@@ -216,7 +224,7 @@
         <td>${idx + 1}</td>
         <td>${escapeHtml(r.name)}</td>
         <td>${escapeHtml(r.email)}</td>
-        <td>${escapeHtml(r.prize)}</td>
+        <td><span class="prize-badge">${escapeHtml(r.prize)}</span></td>
         <td>${formatDate(r.timestamp)}</td>
       `;
       spinsTableBody.appendChild(tr);
@@ -234,7 +242,7 @@
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `spins_${new Date().toISOString().slice(0,19).replace(/[:T]/g,'-')}.csv`;
+    a.download = `onam_spins_${new Date().toISOString().slice(0,19).replace(/[:T]/g,'-')}.csv`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -280,6 +288,7 @@
       alreadySpunMsg.classList.remove("hidden");
       showSection("wheelSection", true);
       spinBtn.disabled = true;
+      spinBtn.textContent = "Already Spun";
       resultText.textContent = `Your prize: ${existing.prize}`;
       thankYou.classList.remove("hidden");
       return;
@@ -288,7 +297,9 @@
     // Allow spin now
     showSection("wheelSection", true);
     spinBtn.disabled = false;
-    registrationSection.scrollIntoView({ behavior: "smooth", block: "start" });
+    spinBtn.textContent = "Spin the Wheel";
+    alreadySpunMsg.classList.add("hidden");
+    wheelSection.scrollIntoView({ behavior: "smooth", block: "center" });
   });
 
   spinBtn.addEventListener("click", function () {
@@ -300,15 +311,17 @@
     if (existing) {
       resultText.textContent = `Already spun: ${existing.prize}`;
       spinBtn.disabled = true;
+      spinBtn.textContent = "Already Spun";
       thankYou.classList.remove("hidden");
       return;
     }
 
     spinWheel(function (selectedIndex) {
       const prize = prizes[selectedIndex];
-      resultText.textContent = `You won: ${prize}`;
+      resultText.textContent = `🎉 You won: ${prize}`;
       thankYou.classList.remove("hidden");
       spinBtn.disabled = true;
+      spinBtn.textContent = "Completed";
       const record = {
         name,
         email,
@@ -349,14 +362,9 @@
     if (confirm("This will remove all local spin records. Continue?")) {
       localStorage.removeItem("spin_records");
       renderAdmin();
+      alert("All records cleared successfully.");
     }
   });
-
-  // Utilities re-used
-  function findRecordByEmail(email) {
-    const records = getRecords();
-    return records.find(r => r.email.toLowerCase() === email.toLowerCase());
-  }
 
   // Remote sync functions
   async function pushRecordRemote(record) {
@@ -374,5 +382,3 @@
   // Initialize
   initWheel();
 })();
-
-
