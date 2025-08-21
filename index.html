@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Spin & Win</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <header class="header">
+        <h1>Spin & Win</h1>
+        <nav class="nav">
+          <button id="toggleAdmin" class="link-button" title="View Spins">Admin</button>
+        </nav>
+      </header>
+
+      <main>
+        <section id="registrationSection" class="card">
+          <h2>Register to Spin</h2>
+          <form id="registrationForm" autocomplete="on">
+            <div class="field">
+              <label for="name">Name</label>
+              <input id="name" name="name" type="text" required />
+            </div>
+            <div class="field">
+              <label for="email">Email</label>
+              <input id="email" name="email" type="email" required />
+            </div>
+            <button id="registerBtn" type="submit" class="primary">Register</button>
+          </form>
+          <p id="registrationNote" class="note">You can spin only after registering.</p>
+          <p id="alreadySpunMsg" class="note hidden"></p>
+        </section>
+
+        <section id="wheelSection" class="card hidden">
+          <h2>Spin the Wheel</h2>
+          <div class="wheel-wrap">
+            <canvas id="wheelCanvas" width="500" height="500" aria-label="Spinning prize wheel"></canvas>
+            <div class="pointer" aria-hidden="true"></div>
+          </div>
+          <button id="spinBtn" class="primary" disabled>Spin</button>
+          <p id="resultText" class="result"></p>
+          <div id="thankYou" class="thankyou hidden">Thank you for participating!</div>
+        </section>
+
+        <section id="adminSection" class="card hidden">
+          <h2>Spins Admin</h2>
+          <div class="admin-actions">
+            <button id="exportCsvBtn">Download CSV</button>
+            <button id="clearAllBtn" class="danger" title="Removes all local records">Clear Local Records</button>
+          </div>
+          <div class="table-wrap">
+            <table id="spinsTable">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Prize</th>
+                  <th>Timestamp</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <p class="note">Data is stored locally in this browser. For multi-user tracking, connect a backend.</p>
+        </section>
+      </main>
+
+      <footer class="footer">
+        <small>Spin & Win demo — client-side only</small>
+      </footer>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+  </html>
+
+
