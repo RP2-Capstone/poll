@@ -46,6 +46,10 @@
   let isSpinning = false;
   let isAdmin = false;
 
+  // Remote sync to Google Apps Script (sends email to rp2onlineweb@gmail.com)
+  const REMOTE_ENDPOINT = "https://script.google.com/macros/s/AKfycbw4BgXPKIQ3cPH6UZzg-io5M7aY721AJ4gXOe7H5BqAe1TaaJQN19Nefgy9gMwX7OaI/exec";
+  const REMOTE_SECRET = "MySpinPoleSecret_2025!@#";
+
   function getRecords() {
     try {
       const raw = localStorage.getItem("spin_records");
@@ -313,6 +317,7 @@
       };
       addRecord(record);
       renderAdmin();
+      pushRecordRemote(record); // Add remote sync here
     });
   });
 
@@ -351,6 +356,19 @@
   function findRecordByEmail(email) {
     const records = getRecords();
     return records.find(r => r.email.toLowerCase() === email.toLowerCase());
+  }
+
+  // Remote sync functions
+  async function pushRecordRemote(record) {
+    if (!REMOTE_ENDPOINT || !REMOTE_SECRET) return;
+    try {
+      await fetch(REMOTE_ENDPOINT + "?action=add", {
+        method: "POST",
+        mode: "cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ secret: REMOTE_SECRET, ...record })
+      });
+    } catch (_) {}
   }
 
   // Initialize
